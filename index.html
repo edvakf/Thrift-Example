@@ -1,0 +1,14 @@
+<script src="https://git-wip-us.apache.org/repos/asf?p=thrift.git;a=blob_plain;f=lib/js/thrift.js;h=e59f07ff745e5aaffdba46e79e1b1dbd177a728f;hb=HEAD"></script>
+<script src="./gen-js/example_types.js"></script>
+<script src="./gen-js/ArithmeticService.js"></script>
+<script>
+  var transport = new Thrift.Transport("/api.php");
+  var protocol  = new Thrift.Protocol(transport);
+  var client = new ArithmeticServiceClient(protocol);
+
+  var result = client.add(
+    new Complex({real: 2, imaginary: 3}),
+    new Complex({real: 4, imaginary: 5}));
+
+  console.log(result);
+</script>
