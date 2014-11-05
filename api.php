@@ -29,16 +29,17 @@ class ArithmeticServiceImpl implements \My\Example\ArithmeticServiceIf
     public function multiply(\My\Example\Complex $i1, \My\Example\Complex $i2)
     {
         return new \My\Example\Complex([
-            'real' => $i1->real * $i2->real,
-            'imaginary' => $i1->imaginary * $i2->imaginary,
+            'real' => $i1->real * $i2->real - $i1->imaginary * $i2->imaginary,
+            'imaginary' => $i2->real * $i1->imaginary + $i1->real * $i2->imaginary,
         ]);
     }
 
     public function divide(\My\Example\Complex $i1, \My\Example\Complex $i2)
     {
+        $i2_length_squaread = $i2->real * $i2->real + $i2->imaginary * $i2->imaginary;
         return new \My\Example\Complex([
-            'real' => $i1->real / $i2->real,
-            'imaginary' => $i1->imaginary / $i2->imaginary,
+            'real' => ($i1->real * $i2->real + $i1->imaginary * $i2->imaginary) / $i2_length_squaread,
+            'imaginary' => ($i1->imaginary * $i2->real - $i1->real * $i2->imaginary) / $i2_length_squaread,
         ]);
     }
 }
