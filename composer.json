@@ -1,0 +1,10 @@
+{
+  "name": "edvakf/thrift-example",
+  "license": "MIT",
+  "autoload": {
+    "classmap": ["gen-php/"]
+  },
+  "require": {
+    "leric/php-thrift": "0.9.*"
+  }
+}
