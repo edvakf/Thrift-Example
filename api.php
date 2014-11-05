@@ -37,6 +37,9 @@ class ArithmeticServiceImpl implements \My\Example\ArithmeticServiceIf
     public function divide(\My\Example\Complex $i1, \My\Example\Complex $i2)
     {
         $i2_length_squaread = $i2->real * $i2->real + $i2->imaginary * $i2->imaginary;
+        if ($i2_length_squaread == 0) {
+            throw new \My\Example\ZeroDivisionException();
+        }
         return new \My\Example\Complex([
             'real' => ($i1->real * $i2->real + $i1->imaginary * $i2->imaginary) / $i2_length_squaread,
             'imaginary' => ($i1->imaginary * $i2->real - $i1->real * $i2->imaginary) / $i2_length_squaread,

@@ -177,6 +177,66 @@
 
 @end
 
+@implementation ZeroDivisionException
+
+- (id) init
+{
+  return [super initWithName: @"ZeroDivisionException" reason: @"unknown" userInfo: nil];
+}
+
+- (id) initWithCoder: (NSCoder *) decoder
+{
+  self = [super initWithCoder: decoder];
+  return self;
+}
+
+- (void) encodeWithCoder: (NSCoder *) encoder
+{
+  [super encodeWithCoder: encoder];
+}
+
+- (void) read: (id <TProtocol>) inProtocol
+{
+  NSString * fieldName;
+  int fieldType;
+  int fieldID;
+
+  [inProtocol readStructBeginReturningName: NULL];
+  while (true)
+  {
+    [inProtocol readFieldBeginReturningName: &fieldName type: &fieldType fieldID: &fieldID];
+    if (fieldType == TType_STOP) { 
+      break;
+    }
+    switch (fieldID)
+    {
+      default:
+        [TProtocolUtil skipType: fieldType onProtocol: inProtocol];
+        break;
+    }
+    [inProtocol readFieldEnd];
+  }
+  [inProtocol readStructEnd];
+}
+
+- (void) write: (id <TProtocol>) outProtocol {
+  [outProtocol writeStructBeginWithName: @"ZeroDivisionException"];
+  [outProtocol writeFieldStop];
+  [outProtocol writeStructEnd];
+}
+
+- (void) validate {
+  // check for required fields
+}
+
+- (NSString *) description {
+  NSMutableString * ms = [NSMutableString stringWithString: @"ZeroDivisionException("];
+  [ms appendString: @")"];
+  return [NSString stringWithString: ms];
+}
+
+@end
+
 
 @implementation exampleConstants
 + (void) initialize {
@@ -1489,16 +1549,19 @@
 
 @interface Divide_result : NSObject <TBase, NSCoding> {
   Complex * __success;
+  ZeroDivisionException * __ex;
 
   BOOL __success_isset;
+  BOOL __ex_isset;
 }
 
 #if TARGET_OS_IPHONE || (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5)
 @property (nonatomic, retain, getter=success, setter=setSuccess:) Complex * success;
+@property (nonatomic, retain, getter=ex, setter=setEx:) ZeroDivisionException * ex;
 #endif
 
 - (id) init;
-- (id) initWithSuccess: (Complex *) success;
+- (id) initWithSuccess: (Complex *) success ex: (ZeroDivisionException *) ex;
 
 - (void) read: (id <TProtocol>) inProtocol;
 - (void) write: (id <TProtocol>) outProtocol;
@@ -1510,6 +1573,12 @@
 - (void) setSuccess: (Complex *) success;
 #endif
 - (BOOL) successIsSet;
+
+#if !__has_feature(objc_arc)
+- (ZeroDivisionException *) ex;
+- (void) setEx: (ZeroDivisionException *) ex;
+#endif
+- (BOOL) exIsSet;
 
 @end
 
@@ -1523,11 +1592,13 @@
   return self;
 }
 
-- (id) initWithSuccess: (Complex *) success
+- (id) initWithSuccess: (Complex *) success ex: (ZeroDivisionException *) ex
 {
   self = [super init];
   __success = [success retain_stub];
   __success_isset = YES;
+  __ex = [ex retain_stub];
+  __ex_isset = YES;
   return self;
 }
 
@@ -1539,6 +1610,11 @@
     __success = [[decoder decodeObjectForKey: @"success"] retain_stub];
     __success_isset = YES;
   }
+  if ([decoder containsValueForKey: @"ex"])
+  {
+    __ex = [[decoder decodeObjectForKey: @"ex"] retain_stub];
+    __ex_isset = YES;
+  }
   return self;
 }
 
@@ -1548,11 +1624,16 @@
   {
     [encoder encodeObject: __success forKey: @"success"];
   }
+  if (__ex_isset)
+  {
+    [encoder encodeObject: __ex forKey: @"ex"];
+  }
 }
 
 - (void) dealloc
 {
   [__success release_stub];
+  [__ex release_stub];
   [super dealloc_stub];
 }
 
@@ -1575,6 +1656,27 @@
   [__success release_stub];
   __success = nil;
   __success_isset = NO;
+}
+
+- (ZeroDivisionException *) ex {
+  return [[__ex retain_stub] autorelease_stub];
+}
+
+- (void) setEx: (ZeroDivisionException *) ex {
+  [ex retain_stub];
+  [__ex release_stub];
+  __ex = ex;
+  __ex_isset = YES;
+}
+
+- (BOOL) exIsSet {
+  return __ex_isset;
+}
+
+- (void) unsetEx {
+  [__ex release_stub];
+  __ex = nil;
+  __ex_isset = NO;
 }
 
 - (void) read: (id <TProtocol>) inProtocol
@@ -1602,6 +1704,16 @@
           [TProtocolUtil skipType: fieldType onProtocol: inProtocol];
         }
         break;
+      case 1:
+        if (fieldType == TType_STRUCT) {
+          ZeroDivisionException *fieldValue = [[ZeroDivisionException alloc] init];
+          [fieldValue read: inProtocol];
+          [self setEx: fieldValue];
+          [fieldValue release_stub];
+        } else { 
+          [TProtocolUtil skipType: fieldType onProtocol: inProtocol];
+        }
+        break;
       default:
         [TProtocolUtil skipType: fieldType onProtocol: inProtocol];
         break;
@@ -1620,6 +1732,12 @@
       [__success write: outProtocol];
       [outProtocol writeFieldEnd];
     }
+  } else if (__ex_isset) {
+    if (__ex != nil) {
+      [outProtocol writeFieldBeginWithName: @"ex" type: TType_STRUCT fieldID: 1];
+      [__ex write: outProtocol];
+      [outProtocol writeFieldEnd];
+    }
   }
   [outProtocol writeFieldStop];
   [outProtocol writeStructEnd];
@@ -1633,6 +1751,8 @@
   NSMutableString * ms = [NSMutableString stringWithString: @"Divide_result("];
   [ms appendString: @"success:"];
   [ms appendFormat: @"%@", __success];
+  [ms appendString: @",ex:"];
+  [ms appendFormat: @"%@", __ex];
   [ms appendString: @")"];
   return [NSString stringWithString: ms];
 }
@@ -1829,6 +1949,9 @@
   [inProtocol readMessageEnd];
   if ([result successIsSet]) {
     return [result success];
+  }
+  if ([result exIsSet]) {
+    @throw [result ex];
   }
   @throw [TApplicationException exceptionWithType: TApplicationException_MISSING_RESULT
                                            reason: @"divide failed: unknown result"];

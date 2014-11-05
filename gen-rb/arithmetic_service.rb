@@ -68,6 +68,7 @@ module ArithmeticService
     def recv_divide()
       result = receive_message(Divide_result)
       return result.success unless result.success.nil?
+      raise result.ex unless result.ex.nil?
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'divide failed: unknown result')
     end
 
@@ -100,7 +101,11 @@ module ArithmeticService
     def process_divide(seqid, iprot, oprot)
       args = read_args(iprot, Divide_args)
       result = Divide_result.new()
-      result.success = @handler.divide(args.i1, args.i2)
+      begin
+        result.success = @handler.divide(args.i1, args.i2)
+      rescue ::ZeroDivisionException => ex
+        result.ex = ex
+      end
       write_result(result, oprot, 'divide', seqid)
     end
 
@@ -231,9 +236,11 @@ module ArithmeticService
   class Divide_result
     include ::Thrift::Struct, ::Thrift::Struct_Union
     SUCCESS = 0
+    EX = 1
 
     FIELDS = {
-      SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => ::Complex}
+      SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => ::Complex},
+      EX => {:type => ::Thrift::Types::STRUCT, :name => 'ex', :class => ::ZeroDivisionException}
     }
 
     def struct_fields; FIELDS; end

@@ -71,3 +71,32 @@ Complex.prototype.write = function(output) {
   return;
 };
 
+ZeroDivisionException = function(args) {
+};
+Thrift.inherits(ZeroDivisionException, Thrift.TException);
+ZeroDivisionException.prototype.name = 'ZeroDivisionException';
+ZeroDivisionException.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true)
+  {
+    var ret = input.readFieldBegin();
+    var fname = ret.fname;
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    input.skip(ftype);
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+ZeroDivisionException.prototype.write = function(output) {
+  output.writeStructBegin('ZeroDivisionException');
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+

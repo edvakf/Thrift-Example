@@ -24,3 +24,18 @@ class Complex
   ::Thrift::Struct.generate_accessors self
 end
 
+class ZeroDivisionException < ::Thrift::Exception
+  include ::Thrift::Struct, ::Thrift::Struct_Union
+
+  FIELDS = {
+
+  }
+
+  def struct_fields; FIELDS; end
+
+  def validate
+  end
+
+  ::Thrift::Struct.generate_accessors self
+end
+

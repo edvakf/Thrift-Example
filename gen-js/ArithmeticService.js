@@ -443,9 +443,17 @@ ArithmeticService_divide_args.prototype.write = function(output) {
 
 ArithmeticService_divide_result = function(args) {
   this.success = null;
+  this.ex = null;
+  if (args instanceof ZeroDivisionException) {
+    this.ex = args;
+    return;
+  }
   if (args) {
     if (args.success !== undefined) {
       this.success = args.success;
+    }
+    if (args.ex !== undefined) {
+      this.ex = args.ex;
     }
   }
 };
@@ -471,9 +479,14 @@ ArithmeticService_divide_result.prototype.read = function(input) {
         input.skip(ftype);
       }
       break;
-      case 0:
+      case 1:
+      if (ftype == Thrift.Type.STRUCT) {
+        this.ex = new ZeroDivisionException();
+        this.ex.read(input);
+      } else {
         input.skip(ftype);
-        break;
+      }
+      break;
       default:
         input.skip(ftype);
     }
@@ -488,6 +501,11 @@ ArithmeticService_divide_result.prototype.write = function(output) {
   if (this.success !== null && this.success !== undefined) {
     output.writeFieldBegin('success', Thrift.Type.STRUCT, 0);
     this.success.write(output);
+    output.writeFieldEnd();
+  }
+  if (this.ex !== null && this.ex !== undefined) {
+    output.writeFieldBegin('ex', Thrift.Type.STRUCT, 1);
+    this.ex.write(output);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -660,6 +678,9 @@ ArithmeticServiceClient.prototype.recv_divide = function() {
   result.read(this.input);
   this.input.readMessageEnd();
 
+  if (null !== result.ex) {
+    throw result.ex;
+  }
   if (null !== result.success) {
     return result.success;
   }

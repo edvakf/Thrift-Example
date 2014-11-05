@@ -53,11 +53,23 @@ typedef int64_t int;
 
 @end
 
+@interface ZeroDivisionException : NSException <TBase, NSCoding> {
+}
+
+- (id) init;
+
+- (void) read: (id <TProtocol>) inProtocol;
+- (void) write: (id <TProtocol>) outProtocol;
+
+- (void) validate;
+
+@end
+
 @protocol ArithmeticService <NSObject>
 - (Complex *) add: (Complex *) i1 i2: (Complex *) i2;  // throws TException
 - (Complex *) subtract: (Complex *) i1 i2: (Complex *) i2;  // throws TException
 - (Complex *) multiply: (Complex *) i1 i2: (Complex *) i2;  // throws TException
-- (Complex *) divide: (Complex *) i1 i2: (Complex *) i2;  // throws TException
+- (Complex *) divide: (Complex *) i1 i2: (Complex *) i2;  // throws ZeroDivisionException *, TException
 @end
 
 @interface ArithmeticServiceClient : NSObject <ArithmeticService> {

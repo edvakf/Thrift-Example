@@ -239,6 +239,9 @@ class ArithmeticServiceClient implements \My\Example\ArithmeticServiceIf {
     if ($result->success !== null) {
       return $result->success;
     }
+    if ($result->ex !== null) {
+      throw $result->ex;
+    }
     throw new \Exception("divide failed: unknown result");
   }
 
@@ -889,6 +892,7 @@ class ArithmeticService_divide_result {
   static $_TSPEC;
 
   public $success = null;
+  public $ex = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -898,11 +902,19 @@ class ArithmeticService_divide_result {
           'type' => TType::STRUCT,
           'class' => '\My\Example\Complex',
           ),
+        1 => array(
+          'var' => 'ex',
+          'type' => TType::STRUCT,
+          'class' => '\My\Example\ZeroDivisionException',
+          ),
         );
     }
     if (is_array($vals)) {
       if (isset($vals['success'])) {
         $this->success = $vals['success'];
+      }
+      if (isset($vals['ex'])) {
+        $this->ex = $vals['ex'];
       }
     }
   }
@@ -934,6 +946,14 @@ class ArithmeticService_divide_result {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->ex = new \My\Example\ZeroDivisionException();
+            $xfer += $this->ex->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -953,6 +973,11 @@ class ArithmeticService_divide_result {
       }
       $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
       $xfer += $this->success->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->ex !== null) {
+      $xfer += $output->writeFieldBegin('ex', TType::STRUCT, 1);
+      $xfer += $this->ex->write($output);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -1051,7 +1076,11 @@ class ArithmeticServiceProcessor {
     $args->read($input);
     $input->readMessageEnd();
     $result = new \My\Example\ArithmeticService_divide_result();
-    $result->success = $this->handler_->divide($args->i1, $args->i2);
+    try {
+      $result->success = $this->handler_->divide($args->i1, $args->i2);
+    } catch (\My\Example\ZeroDivisionException $ex) {
+      $result->ex = $ex;
+    }
     $bin_accel = ($output instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_write_binary');
     if ($bin_accel)
     {

@@ -9,12 +9,14 @@ struct Complex {
   2: int imaginary,
 }
 
+exception ZeroDivisionException {}
+
 service ArithmeticService
 {
   Complex add(1:Complex i1, 2:Complex i2),
   Complex subtract(1:Complex i1, 2:Complex i2),
   Complex multiply(1:Complex i1, 2:Complex i2),
-  Complex divide(1:Complex i1, 2:Complex i2),
+  Complex divide(1:Complex i1, 2:Complex i2) throws (1:ZeroDivisionException ex),
 }
 
 

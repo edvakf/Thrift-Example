@@ -184,6 +184,8 @@ class Client(Iface):
     self._iprot.readMessageEnd()
     if result.success is not None:
       return result.success
+    if result.ex is not None:
+      raise result.ex
     raise TApplicationException(TApplicationException.MISSING_RESULT, "divide failed: unknown result");
 
 
@@ -249,7 +251,10 @@ class Processor(Iface, TProcessor):
     args.read(iprot)
     iprot.readMessageEnd()
     result = divide_result()
-    result.success = self._handler.divide(args.i1, args.i2)
+    try:
+      result.success = self._handler.divide(args.i1, args.i2)
+    except ZeroDivisionException, ex:
+      result.ex = ex
     oprot.writeMessageBegin("divide", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
@@ -738,14 +743,17 @@ class divide_result:
   """
   Attributes:
    - success
+   - ex
   """
 
   thrift_spec = (
     (0, TType.STRUCT, 'success', (Complex, Complex.thrift_spec), None, ), # 0
+    (1, TType.STRUCT, 'ex', (ZeroDivisionException, ZeroDivisionException.thrift_spec), None, ), # 1
   )
 
-  def __init__(self, success=None,):
+  def __init__(self, success=None, ex=None,):
     self.success = success
+    self.ex = ex
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -762,6 +770,12 @@ class divide_result:
           self.success.read(iprot)
         else:
           iprot.skip(ftype)
+      elif fid == 1:
+        if ftype == TType.STRUCT:
+          self.ex = ZeroDivisionException()
+          self.ex.read(iprot)
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -775,6 +789,10 @@ class divide_result:
     if self.success is not None:
       oprot.writeFieldBegin('success', TType.STRUCT, 0)
       self.success.write(oprot)
+      oprot.writeFieldEnd()
+    if self.ex is not None:
+      oprot.writeFieldBegin('ex', TType.STRUCT, 1)
+      self.ex.write(oprot)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
